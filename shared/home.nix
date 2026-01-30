@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 
 let
   username = "cosmic";
@@ -72,13 +72,12 @@ in
         else "sudo nixos-rebuild switch --flake .";
     };
 
-    # FIX: Changed initExtra to initContent
     initContent = ''
       eval "$(starship init zsh)"
     '';
   };
 
-  # --- FILE MANAGEMENT ---
+  # --- FILE MANAGEMENT & ASSETS ---
   home.file = {
     # 1. Global: Starship Config
     ".config/starship.toml".text = ''
@@ -86,8 +85,16 @@ in
       [username]
       disabled = true
     '';
+
+    # 2. WALLPAPERS (Added This Section)
+    # Recursively links ~/nixos/assets/wallpapers -> ~/Pictures/wallpapers
+    "Pictures/wallpapers" = {
+      source = ../assets/wallpapers;
+      recursive = true;
+    };
+
   } // lib.optionalAttrs isLinux {
-    # 2. Linux Only: Kate LSP Config
+    # 3. Linux Only: Kate LSP Config
     ".config/kate/lspclient/settings.json".text = builtins.toJSON {
       servers = {
         nix = {
