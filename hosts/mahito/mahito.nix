@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  networking.hostName = "Mahito";
+  networking.hostName = "mahito";
 
   # Mahito Specifics (Intel CPU)
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

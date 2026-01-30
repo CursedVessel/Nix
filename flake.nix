@@ -2,6 +2,7 @@
   description = "Jujutsu Kaisen Homelab: Mahito, Itadori, Geto, & Toji";
 
   inputs = {
+    # 1. BASE SYSTEM (Unstable Channel includes COSMIC now)
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager.url = "github:nix-community/home-manager";
@@ -34,10 +35,10 @@
       itadori = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./configuration.nix                # Imports shared modules from ./modules/
+          ./configuration.nix
           ./hosts/itadori/itadori.nix
           ./hosts/itadori/hardware-configuration.nix
-          ./modules/nvidia.nix               # Explicitly import Nvidia module here
+          ./modules/nvidia.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -68,17 +69,12 @@
       toji = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          # We do NOT import ./configuration.nix here because Toji shouldn't have desktop.nix
-          # Instead, we import only the specific modules Toji needs:
           ./modules/system.nix
           ./modules/users.nix
           ./modules/services.nix
           ./modules/boot.nix
           ./modules/system-packages.nix
-
           ./hosts/toji/toji.nix
-          # ./hosts/toji/hardware-configuration.nix  # Uncomment when generated
-
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -87,7 +83,6 @@
           }
         ];
       };
-
     };
   };
 }

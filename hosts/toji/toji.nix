@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  networking.hostName = "Toji";
+  networking.hostName = "toji";
 
   # Server Networking
   networking.networkmanager.enable = lib.mkForce false;

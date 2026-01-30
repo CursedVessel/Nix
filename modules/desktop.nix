@@ -1,48 +1,28 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 
 {
-  # Enable the X11 windowing system (Required for SDDM)
-  services.xserver.enable = true;
+  # --- COSMIC DESKTOP ---
+  services.desktopManager.cosmic.enable = true;
+  services.displayManager.cosmic-greeter.enable = true;
 
-  # --- PLASMA LOGIN MANAGER CONFIGURATION ---
-  # KDE Plasma 6 uses SDDM as its engine.
-  # We force the 'breeze' theme so it acts as the native "Plasma Login".
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true; # Uses Wayland for the login screen itself
-    theme = "breeze";      # <--- This is key for the "Plasma Login" look
-  };
-
-  # Enable the KDE Plasma 6 Desktop Environment
-  services.desktopManager.plasma6.enable = true;
-
-  # X11 Keymap
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  # Steam (Must be enabled at system level for controller/network support)
+  # --- GAMING (Steam) ---
   programs.steam = {
     enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
+    remotePlay.openFirewall = true; # Open ports for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall = true; # Open ports for P2P transfers
   };
 
-  # Fonts
-  fonts = {
-    fontDir.enable = true;
-    enableDefaultPackages = true;
-    packages = with pkgs; [
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-color-emoji
-      dejavu_fonts
-      liberation_ttf
-    ];
-  };
+  # Ensure Gamemode is there for performance
+  programs.gamemode.enable = true;
 
-  system.activationScripts.desktopNote.text = ''
-    echo "Applied desktop.nix: KDE Plasma 6 + Native Breeze Login."
-  '';
+  # --- CLEANUP (Disable KDE) ---
+  # We explicitly disable these to prevent conflicts with COSMIC
+  services.xserver.enable = false;
+  services.displayManager.sddm.enable = false;
+  services.desktopManager.plasma6.enable = false;
+
+  # --- EXTRAS ---
+  # Flatpak is useful for the COSMIC App Store
+  services.flatpak.enable = true;
 }

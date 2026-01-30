@@ -25,24 +25,69 @@ in
       ripgrep
       bat
 
-      # NIX LSP TOOLS
+      # ZED EDITOR
+      zed-editor
+
+      # FONTS
+      nerd-fonts.jetbrains-mono
+
+      # NIX LSP & FORMATTING
       nixd
       nil
+      nixfmt # <--- CHANGED: Was "nixfmt-rfc-style"
     ]
     ++ lib.optionals isLinux [
       discord
       firefox
-      kdePackages.ark
-      kdePackages.okular
-      kdePackages.kate
-      kdePackages.kcalc
-      kdePackages.filelight
+      # COSMIC App Store
       popsicle
+      # Gaming
       protonplus
     ]
     ++ lib.optionals isDarwin [
       raycast
     ];
+
+  # --- FONT CONFIG ---
+  fonts.fontconfig.enable = true;
+
+  # --- XDG CONFIGURATION (Dotfiles) ---
+  xdg.configFile = {
+
+    # 1. FASTFETCH
+    "fastfetch/config.jsonc" = {
+      source = ../dotfiles/fastfetch/config.jsonc;
+    };
+
+    # 2. ZED EDITOR
+    "zed/settings.json".text = builtins.toJSON {
+      ui_font_size = 16;
+      buffer_font_size = 16;
+      theme = "One Dark";
+      languages = {
+        Nix = {
+          language_servers = [ "nixd" "nil" ];
+          formatter = {
+            external = {
+              command = "nixfmt";
+              arguments = ["--quiet" "--stdin"];
+            };
+          };
+        };
+      };
+      lsp = {
+        nixd = {
+          settings = {
+            nixpkgs = { expr = "import <nixpkgs> {}"; };
+            formatting = { command = [ "nixfmt" ]; };
+            options = {
+              nixos = { expr = "(builtins.getFlake \"/home/${username}/nixos\").nixosConfigurations.mahito.options"; };
+            };
+          };
+        };
+      };
+    };
+  };
 
   # --- GIT CONFIG ---
   programs.git = {
@@ -77,33 +122,19 @@ in
     '';
   };
 
-  # --- FILE MANAGEMENT & ASSETS ---
+  # --- HOME FILES (Root level) ---
   home.file = {
-    # 1. Global: Starship Config
+    # 1. STARSHIP
     ".config/starship.toml".text = ''
       add_newline = false
       [username]
       disabled = true
     '';
 
-    # 2. WALLPAPERS (Added This Section)
-    # Recursively links ~/nixos/assets/wallpapers -> ~/Pictures/wallpapers
+    # 2. WALLPAPERS
     "Pictures/wallpapers" = {
       source = ../assets/wallpapers;
       recursive = true;
-    };
-
-  } // lib.optionalAttrs isLinux {
-    # 3. Linux Only: Kate LSP Config
-    ".config/kate/lspclient/settings.json".text = builtins.toJSON {
-      servers = {
-        nix = {
-          command = ["nixd"];
-          root = "";
-          url = "https://github.com/nix-community/nixd";
-          highlightingModeRegex = "^Nix$";
-        };
-      };
     };
   };
 }

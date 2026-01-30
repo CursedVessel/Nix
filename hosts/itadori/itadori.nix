@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  networking.hostName = "Itadori";
+  networking.hostName = "itadori";
 
   # FIX: "services.power" is not a valid option.
   # We use power-profiles-daemon instead.
