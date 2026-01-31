@@ -2,7 +2,7 @@
   description = "Jujutsu Kaisen Homelab: Mahito, Itadori, Geto, & Toji";
 
   inputs = {
-    # 1. BASE SYSTEM (Unstable Channel includes COSMIC now)
+    # 1. BASE SYSTEM
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager.url = "github:nix-community/home-manager";
@@ -10,9 +10,13 @@
 
     darwin.url = "github:LnL7/nix-darwin";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    # 2. SOPS-NIX (Secrets)
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, ... }: {
+  outputs = { self, nixpkgs, home-manager, darwin, sops-nix, ... }: {
 
     # --- MACOS (Geto) ---
     darwinConfigurations."Geto" = darwin.lib.darwinSystem {
@@ -31,7 +35,7 @@
     # --- NIXOS (Linux) ---
     nixosConfigurations = {
 
-      # ITADORI (Desktop)
+      # ITADORI
       itadori = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -52,6 +56,9 @@
       mahito = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          # Import SOPS Module
+          sops-nix.nixosModules.sops
+
           ./configuration.nix
           ./hosts/mahito/mahito.nix
           ./hosts/mahito/hardware-configuration.nix
@@ -65,7 +72,7 @@
         ];
       };
 
-      # TOJI (Server)
+      # TOJI
       toji = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [

@@ -1,0 +1,9 @@
+keys:
+  # PASTE YOUR KEY BELOW (keep the quotes)
+  - &mahito "age1flm03x6r6u0yjucpv0pcxwtpaewalpk249v09mq3vkpasxfvmvlqe3erg8"
+
+creation_rules:
+  - path_regex: secrets/.*
+    key_groups:
+      - age:
+          - *mahito
